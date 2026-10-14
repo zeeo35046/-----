@@ -636,7 +636,19 @@ function App() {
                 const poster = orderedAssets.find((item) => !item.endsWith('.mp4') && !item.endsWith('.gif')) || ''
                 return (
                   <figure className={`gallery-wall-item ${isVideo ? 'is-featured-video' : ''}`} style={{ '--item-index': index }} key={asset}>
-                    {isVideo ? <video src={asset} poster={poster} controls playsInline preload="metadata" /> : <img src={asset} alt={`${productGallery.title}作品 ${index + 1}`} loading="lazy" decoding="async" />}
+                    {isVideo ? (
+                      <video src={asset} poster={poster} controls playsInline preload="metadata" />
+                    ) : (
+                      <button
+                        className="gallery-wall-image-button"
+                        type="button"
+                        onClick={() => setLightbox({ image: asset, title: productGallery.title, type: `IMAGE ${String(index + 1).padStart(2, '0')}` })}
+                        aria-label={`放大查看${productGallery.title}作品 ${index + 1}`}
+                      >
+                        <img src={asset} alt={`${productGallery.title}作品 ${index + 1}`} loading="lazy" decoding="async" />
+                        <span>VIEW ↗</span>
+                      </button>
+                    )}
                     <figcaption><span>{String(index + 1).padStart(2, '0')}</span>{isVideo ? 'FILM' : 'IMAGE'}</figcaption>
                   </figure>
                 )
