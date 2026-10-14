@@ -19,6 +19,7 @@ const productGalleries = {
   破局: ['01.jpg', '02.png', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg'].map((file) => `/product-galleries/breakthrough/${file}`),
   夏日之味: ['01.jpg', '02.jpg', '03.jpg', '04.jpg', 'v01.mp4'].map((file) => `/product-galleries/summer-flavor/${file}`),
   月之暗面: ['01.jpg', '02.jpg', 'v01.mp4'].map((file) => `/product-galleries/dark-side-moon/${file}`),
+  翻转台球: ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg'].map((file) => `/product-galleries/flip-billiards/${file}`),
 }
 
 const collections = [
