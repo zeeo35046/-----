@@ -379,6 +379,13 @@ function App() {
     ]
     if (reduceMotion) return undefined
 
+    // Prepare reveal elements before observation so they never flash in their
+    // final position and then jump back to the animation's first frame.
+    revealTargets.concat(cardTargets).forEach((element) => {
+      element.style.opacity = '0'
+      element.style.willChange = 'transform, opacity, clip-path'
+    })
+
     const heroTargets = [...document.querySelectorAll('.hero-overline, .hero-title-line b, .hero-intro, .hero-cta, .hero-index, .hero-play')]
     heroTargets.forEach((element, index) => {
       const animation = element.animate([
@@ -398,11 +405,15 @@ function App() {
             { opacity: 0, transform: isCard ? 'translateY(72px) scale(.97)' : 'translateY(100px) scaleY(.88)', clipPath: isCard ? 'inset(10% 0 0)' : 'inset(0 0 100% 0)' },
             { opacity: 1, transform: 'none', clipPath: 'inset(0)' },
           ], { duration: isCard ? 1100 : 1350, delay: isCard ? order * 80 : 0, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' })
-          animation.onfinish = () => animation.cancel()
+          animation.onfinish = () => {
+            entry.target.style.opacity = ''
+            entry.target.style.willChange = ''
+            animation.cancel()
+          }
           observer.unobserve(entry.target)
         }
       })
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 })
+    }, { rootMargin: '0px 0px 22% 0px', threshold: 0.01 })
     revealTargets.concat(cardTargets).forEach((element) => observer.observe(element))
 
     const parallaxMedia = [...document.querySelectorAll('.series-media img, .spotlight-visual img, .profile-photo img')]
@@ -493,7 +504,7 @@ function App() {
             <article className={`spotlight-card ${item.visual}`} key={item.number}>
               <div className="spotlight-visual">
                 {item.visual === 'multifunction' ? (
-                  <ClickToPlayVideo />
+                  <ClickToPlayVideo poster="/multifunction-watch-poster.jpg" />
                 ) : (
                   <button className="spotlight-image-button" type="button" onClick={() => setLightbox(item)} aria-label={`放大查看${item.title}商业案例图片`}>
                     <img src={item.image} alt={`${item.title}商业案例界面`} loading="lazy" decoding="async" />
@@ -620,11 +631,12 @@ function App() {
               <button className="gallery-modal-close" type="button" onClick={() => setProductGallery(null)} aria-label="关闭产品图集">×</button>
             </header>
             <div className="product-gallery-wall">
-              {productGallery.assets.map((asset, index) => {
+              {[...productGallery.assets].sort((a, b) => Number(b.endsWith('.mp4')) - Number(a.endsWith('.mp4'))).map((asset, index, orderedAssets) => {
                 const isVideo = asset.endsWith('.mp4')
+                const poster = orderedAssets.find((item) => !item.endsWith('.mp4') && !item.endsWith('.gif')) || ''
                 return (
-                  <figure className={`gallery-wall-item item-${index % 6}`} style={{ '--item-index': index }} key={asset}>
-                    {isVideo ? <video src={asset} controls playsInline preload="none" /> : <img src={asset} alt={`${productGallery.title}作品 ${index + 1}`} loading="lazy" decoding="async" />}
+                  <figure className={`gallery-wall-item ${isVideo ? 'is-featured-video' : ''}`} style={{ '--item-index': index }} key={asset}>
+                    {isVideo ? <video src={asset} poster={poster} controls playsInline preload="metadata" /> : <img src={asset} alt={`${productGallery.title}作品 ${index + 1}`} loading="lazy" decoding="async" />}
                     <figcaption><span>{String(index + 1).padStart(2, '0')}</span>{isVideo ? 'FILM' : 'IMAGE'}</figcaption>
                   </figure>
                 )
