@@ -177,25 +177,6 @@ function SeriesGallery({ collection, onOpenGallery }) {
 function HeroVideo() {
   const canvasRef = useRef(null)
   const [hasVideo, setHasVideo] = useState(false)
-  const [videoSrc, setVideoSrc] = useState('')
-
-  useEffect(() => {
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
-    if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || '')) return undefined
-    let idleId
-    let timerId
-    const beginLoad = () => {
-      if ('requestIdleCallback' in window) idleId = window.requestIdleCallback(() => setVideoSrc('/hero-video.mp4'), { timeout: 1800 })
-      else timerId = window.setTimeout(() => setVideoSrc('/hero-video.mp4'), 650)
-    }
-    if (document.readyState === 'complete') beginLoad()
-    else window.addEventListener('load', beginLoad, { once: true })
-    return () => {
-      window.removeEventListener('load', beginLoad)
-      if (idleId) window.cancelIdleCallback(idleId)
-      if (timerId) window.clearTimeout(timerId)
-    }
-  }, [])
 
   useEffect(() => {
     if (hasVideo) return undefined
@@ -296,13 +277,13 @@ function HeroVideo() {
     <div className={`hero-media ${hasVideo ? 'has-video' : 'fallback-active'}`} aria-hidden="true">
       <canvas ref={canvasRef} />
       <video
-        src={videoSrc || undefined}
+        src="/hero-video.mp4"
         autoPlay
         muted
         playsInline
         loop
-        preload="none"
-        onCanPlay={() => setHasVideo(true)}
+        preload="auto"
+        onLoadedData={() => setHasVideo(true)}
         onError={() => setHasVideo(false)}
       />
       <div className="hero-grain" />
